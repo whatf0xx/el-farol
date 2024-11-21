@@ -49,10 +49,6 @@ def night(guests: List[Guest]) -> int:
 
 if __name__ == "__main__":
     guests = initialise_guests(100)
-    for guest in guests[:10]:
-        print(f"{guest}, neighbours: {guest.neighbours}")
-    for guest in guests[90:]:
-        print(f"{guest}, neighbours: {guest.neighbours}")
     # nights = range(100)
     # attendance = []
     # group_happiness = []
@@ -60,6 +56,6 @@ if __name__ == "__main__":
     #     attendance.append(night(guests))
     #     group_happiness.append(get_group_happiness(guests))
 
-    # attendance, group_happiness = [
-    #     (night(guests), get_group_happiness(guests)) for _ in range(10)
-    # ]
+    attendance, group_happiness = [
+        (night(guests), get_group_happiness(guests)) for _ in range(10)
+    ]

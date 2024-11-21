@@ -35,7 +35,6 @@ class Guest:
             return True
 
         # in the middle, see what our friends think
-        print(self.neighbours)
         opinion_sum = sum(n.happy for n in self.neighbours)
         if opinion_sum > 0:
             # most your friends think you should go
