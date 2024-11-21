@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from random import random
 
 
-NO_GUESTS = 10
-NO_CONNECTIONS = 3
-STARTING_HAPPINESS_THRESHOLD = 0.4
+NO_GUESTS = 400
+NO_CONNECTIONS = 5
+STARTING_HAPPINESS_THRESHOLD = 0.9
 
 
 def rand_bool() -> bool:
@@ -52,19 +52,17 @@ def night(guests: List[Guest]) -> int:
 
 if __name__ == "__main__":
     guests = initialise_guests(NO_GUESTS, NO_CONNECTIONS)
-    for guest in guests:
-        print(f"{guest}, neighbours {guest.neighbours}")
 
-    # attendance, group_happiness = zip(
-    #     *[(night(guests), get_group_happiness(guests)) for _ in range(100)]
-    # )
+    attendance, group_happiness = zip(
+        *[(night(guests), get_group_happiness(guests)) for _ in range(100)]
+    )
 
-    # plt.figure()
-    # plt.plot(attendance)
-    # plt.title("Attendance")
+    plt.figure()
+    plt.plot(attendance)
+    plt.title("Attendance")
 
-    # plt.figure()
-    # plt.plot(group_happiness)
-    # plt.title("Group happiness")
+    plt.figure()
+    plt.plot(group_happiness)
+    plt.title("Group happiness")
 
-    # plt.show()
+    plt.show()

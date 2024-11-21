@@ -35,8 +35,8 @@ class Guest:
             return True
 
         # in the middle, see what our friends think
-        opinion_sum = sum(n.happy for n in self.neighbours)
-        if opinion_sum > 0:
+        opinion_sum = sum(2 * (int(n.happy) - 0.5) for n in self.neighbours)
+        if opinion_sum >= 0:
             # most your friends think you should go
             self.days_since_visit = 0
             return True
