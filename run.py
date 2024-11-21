@@ -1,30 +1,55 @@
 from typing import List
-from bar import Guest
 import matplotlib.pyplot as plt
 from random import random
 
 
-NO_GUESTS = 400
-NO_CONNECTIONS = 5
-STARTING_HAPPINESS_THRESHOLD = 0.9
+NIGHTS = 800
+SHOW_LAST = 100
+NO_GUESTS = 300
+NO_CONNECTIONS = 3
+MAX_CAPACITY = 60
+PEER_PRESSURE = 0.9
 
 
-def rand_bool() -> bool:
-    return random() > STARTING_HAPPINESS_THRESHOLD
+class Guest:
+    def __init__(
+        self, id: int, neighbours: List["Guest"], starting_opinion: float
+    ):
+        self.id = id
+        self.neighbours = neighbours
+        self.opinion = starting_opinion
+
+    def __repr__(self) -> str:
+        return f"Guest{self.id}"
+
+    def evaluate_evening(self, attendance: int, capacity: int):
+        if attendance > capacity:
+            self.opinion = -1.0
+        else:
+            self.opinion = 1.0
+
+    def decide(self, peer_pressure: float) -> bool:
+        neighbour_opinion = sum(n.opinion for n in self.neighbours)
+        decision = self.opinion + peer_pressure * neighbour_opinion
+        if decision > 0:
+            return True
+        else:
+            self.opinion += 0.1
+            return False
 
 
 def initialise_guests(n: int, k: int) -> List[Guest]:
     global DEBUG_COUNTER
     guests = []
     for i in range(k):
-        guest = Guest(i, guests.copy(), rand_bool())
+        guest = Guest(i, guests.copy(), random())
         for pre in guests:
             pre.neighbours.append(guest)
         guests.append(guest)
 
     for i in range(k, n):
         neighbours = guests[i - k : i]
-        guest = Guest(i, neighbours, rand_bool())
+        guest = Guest(i, neighbours, random())
         for pre in guests[i - k : i]:
             pre.neighbours.append(guest)
         guests.append(guest)
@@ -37,32 +62,29 @@ def initialise_guests(n: int, k: int) -> List[Guest]:
     return guests
 
 
-def get_group_happiness(guests: List[Guest]) -> int:
-    return sum(guest.happy for guest in guests)
-
-
 def night(guests: List[Guest]) -> int:
-    attendees = [guest for guest in guests if guest.decide()]
+    # print(f"{guests[50]}; opinion: {guests[50].opinion}")
+    # for n in guests[50].neighbours:
+    #     print(f"\t{n}; opinion: {n.opinion}")
+    attendees = [guest for guest in guests if guest.decide(PEER_PRESSURE)]
     attendance = len(attendees)
     for guest in attendees:
-        guest.evaluate_evening(attendance)
+        guest.evaluate_evening(attendance, MAX_CAPACITY)
 
-    return attendance
+    return attendance, attendance * int(attendance < MAX_CAPACITY)
 
 
 if __name__ == "__main__":
     guests = initialise_guests(NO_GUESTS, NO_CONNECTIONS)
 
-    attendance, group_happiness = zip(
-        *[(night(guests), get_group_happiness(guests)) for _ in range(100)]
-    )
+    attendance, group_happiness = zip(*[night(guests) for _ in range(NIGHTS)])
 
     plt.figure()
-    plt.plot(attendance)
+    plt.plot(attendance[-SHOW_LAST:])
     plt.title("Attendance")
 
     plt.figure()
-    plt.plot(group_happiness)
+    plt.plot(group_happiness[-SHOW_LAST:])
     plt.title("Group happiness")
 
     plt.show()
