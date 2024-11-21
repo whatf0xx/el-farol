@@ -1,12 +1,13 @@
 from typing import List
 import matplotlib.pyplot as plt
 from random import random
+from networkx import random_regular_graph, draw
 
 
 NIGHTS = 800
 SHOW_LAST = 100
-NO_GUESTS = 300
-NO_CONNECTIONS = 3
+NO_GUESTS = 20
+NO_CONNECTIONS = 5
 MAX_CAPACITY = 60
 PEER_PRESSURE = 0.9
 
@@ -77,14 +78,25 @@ def night(guests: List[Guest]) -> int:
 if __name__ == "__main__":
     guests = initialise_guests(NO_GUESTS, NO_CONNECTIONS)
 
-    attendance, group_happiness = zip(*[night(guests) for _ in range(NIGHTS)])
+    # attendance, group_happiness = zip(*[night(guests) for _ in range(NIGHTS)])
 
-    plt.figure()
-    plt.plot(attendance[-SHOW_LAST:])
-    plt.title("Attendance")
+    # plt.figure()
+    # plt.plot(attendance[-SHOW_LAST:])
+    # plt.title("Attendance")
 
-    plt.figure()
-    plt.plot(group_happiness[-SHOW_LAST:])
-    plt.title("Group happiness")
+    # plt.figure()
+    # plt.plot(group_happiness[-SHOW_LAST:])
+    # plt.title("Group happiness")
+    graph = random_regular_graph(NO_CONNECTIONS, NO_GUESTS)
+    degrees = [degree for _, degree in graph.degree()]
+    print("Degrees of nodes:", degrees)
+    draw(
+        graph,
+        with_labels=True,
+        node_color="lightblue",
+        edge_color="gray",
+        node_size=500,
+    )
+    plt.show()
 
     plt.show()
