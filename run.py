@@ -4,36 +4,35 @@ import matplotlib.pyplot as plt
 from random import random
 
 
+NO_GUESTS = 10
+NO_CONNECTIONS = 3
+STARTING_HAPPINESS_THRESHOLD = 0.4
+
+
 def rand_bool() -> bool:
-    return random() > 0.4
+    return random() > STARTING_HAPPINESS_THRESHOLD
 
 
-def initialise_guests(n: int) -> List[Guest]:
-    guest0 = Guest(0, [], rand_bool())
-
-    guest1 = Guest(1, [guest0], rand_bool())
-    guest0.neighbours.append(guest1)
-
-    guest2 = Guest(2, [guest1], rand_bool())
-    guest1.neighbours.append(guest2)
-
-    guests = [guest0, guest1, guest2]
-    for i in range(3, n):
-        neighbours = [guests[i - 1]]
-        if i % 2 == 0:  # if even
-            neighbours.append(guests[i - 3])
-
-        guest = Guest(i, neighbours, rand_bool())
+def initialise_guests(n: int, k: int) -> List[Guest]:
+    global DEBUG_COUNTER
+    guests = []
+    for i in range(k):
+        guest = Guest(i, guests.copy(), rand_bool())
+        for pre in guests:
+            pre.neighbours.append(guest)
         guests.append(guest)
 
-        guests[i - 1].neighbours.append(guest)
-        if i % 2 == 0:
-            guests[i - 3].neighbours.append(guest)
+    for i in range(k, n):
+        neighbours = guests[i - k : i]
+        guest = Guest(i, neighbours, rand_bool())
+        for pre in guests[i - k : i]:
+            pre.neighbours.append(guest)
+        guests.append(guest)
 
-    guests[-3].neighbours.append(guest0)
-    guests[-1].neighbours.extend([guest0, guest2])
-    guest0.neighbours.extend([guests[-1], guests[-2]])
-    guest2.neighbours.append(guests[-2])
+    for i in range(k):
+        guests[i].neighbours.extend(guests[-(k - i) :].copy())
+        for j in range(-(k - i), 0):
+            guests[j].neighbours.append(guests[i])
 
     return guests
 
@@ -52,24 +51,20 @@ def night(guests: List[Guest]) -> int:
 
 
 if __name__ == "__main__":
-    guests = initialise_guests(100)
-    # nights = range(100)
-    # attendance = []
-    # group_happiness = []
-    # for _ in nights:
-    #     attendance.append(night(guests))
-    #     group_happiness.append(get_group_happiness(guests))
+    guests = initialise_guests(NO_GUESTS, NO_CONNECTIONS)
+    for guest in guests:
+        print(f"{guest}, neighbours {guest.neighbours}")
 
-    attendance, group_happiness = zip(
-        *[(night(guests), get_group_happiness(guests)) for _ in range(100)]
-    )
+    # attendance, group_happiness = zip(
+    #     *[(night(guests), get_group_happiness(guests)) for _ in range(100)]
+    # )
 
-    plt.figure()
-    plt.plot(attendance)
-    plt.title("Attendance")
+    # plt.figure()
+    # plt.plot(attendance)
+    # plt.title("Attendance")
 
-    plt.figure()
-    plt.plot(group_happiness)
-    plt.title("Group happiness")
+    # plt.figure()
+    # plt.plot(group_happiness)
+    # plt.title("Group happiness")
 
-    plt.show()
+    # plt.show()
