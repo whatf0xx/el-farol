@@ -2,20 +2,7 @@ from typing import List
 
 
 MAX_TIME_OFF = 5
-
-
-class Bar:
-    def __init__(self):
-        self.guest_list = []
-
-    def check_in(self, guest: "Guest"):
-        self.guest_list.append(guest)
-
-    def capacity(self) -> int:
-        return len(self.guest_list)
-
-    def reset(self):
-        self.guest_list = []
+MAX_CAPACITY = 60
 
 
 class Guest:
@@ -30,11 +17,8 @@ class Guest:
     def __repr__(self) -> str:
         return f"Guest{self.id}"
 
-    def visit(self, bar: Bar):
-        bar.check_in(self)
-
-    def evaluate_evening(self, bar: Bar):
-        if bar.capacity > 60:
+    def evaluate_evening(self, attendance: int):
+        if attendance > MAX_CAPACITY:
             self.happy = False
         else:
             self.happy = True
@@ -45,18 +29,19 @@ class Guest:
             return True
 
         # then last time we went was overcrowded. When do we try again?
-        if self.days_since_last_visit == MAX_TIME_OFF:
+        if self.days_since_visit == MAX_TIME_OFF:
             # go again because it's been so long, anyway
             self.days_since_visit = 0
             return True
 
         # in the middle, see what our friends think
+        print(self.neighbours)
         opinion_sum = sum(n.happy for n in self.neighbours)
         if opinion_sum > 0:
             # most your friends think you should go
-            self.days_since_last_visit = 0
+            self.days_since_visit = 0
             return True
         else:
             # don't bother, wait another day
-            self.days_since_last_visit += 1
+            self.days_since_visit += 1
             return False

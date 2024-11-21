@@ -1,6 +1,8 @@
-from bar import Bar, Guest
+from typing import List
+from bar import Guest
 
-if __name__ == "__main__":
+
+def initialise_guests(n: int) -> List[Guest]:
     guest0 = Guest(0, [], True)
 
     guest1 = Guest(1, [guest0], True)
@@ -10,7 +12,7 @@ if __name__ == "__main__":
     guest1.neighbours.append(guest2)
 
     guests = [guest0, guest1, guest2]
-    for i in range(3, 100):
+    for i in range(3, n):
         neighbours = [guests[i - 1]]
         if i % 2 == 0:  # if even
             neighbours.append(guests[i - 3])
@@ -25,5 +27,35 @@ if __name__ == "__main__":
     guest0.neighbours.append([guests[-1], guests[-2]])
     guest2.neighbours.append(guests[-2])
 
-    for i in range(10):
-        print(f"{guests[i]}, neighbours: {guests[i].neighbours}")
+    return guests
+
+
+def get_group_happiness(guests: List[Guest]) -> int:
+    print("Debug call to get_happiness")
+    return sum(guest.happy for guest in guests)
+
+
+def night(guests: List[Guest]) -> int:
+    print("Debug call to night")
+    attendees = [guest for guest in guests if guest.decide()]
+    attendance = len(attendees)
+    for guest in attendees:
+        guest.evaluate_evening(attendance)
+
+    return attendance
+
+
+if __name__ == "__main__":
+    guests = initialise_guests(10)
+    for guest in guests:
+        print(f"{guest}, neighbours: {guest.neighbours}")
+    # nights = range(100)
+    # attendance = []
+    # group_happiness = []
+    # for _ in nights:
+    #     attendance.append(night(guests))
+    #     group_happiness.append(get_group_happiness(guests))
+
+    # attendance, group_happiness = [
+    #     (night(guests), get_group_happiness(guests)) for _ in range(10)
+    # ]
