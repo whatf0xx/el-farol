@@ -1,7 +1,7 @@
 from typing import List
 
 
-MAX_TIME_OFF = 5
+MAX_TIME_OFF = 15
 MAX_CAPACITY = 60
 
 

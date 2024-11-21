@@ -1,14 +1,20 @@
 from typing import List
 from bar import Guest
+import matplotlib.pyplot as plt
+from random import random
+
+
+def rand_bool() -> bool:
+    return random() > 0.4
 
 
 def initialise_guests(n: int) -> List[Guest]:
-    guest0 = Guest(0, [], True)
+    guest0 = Guest(0, [], rand_bool())
 
-    guest1 = Guest(1, [guest0], True)
+    guest1 = Guest(1, [guest0], rand_bool())
     guest0.neighbours.append(guest1)
 
-    guest2 = Guest(2, [guest1], True)
+    guest2 = Guest(2, [guest1], rand_bool())
     guest1.neighbours.append(guest2)
 
     guests = [guest0, guest1, guest2]
@@ -17,7 +23,7 @@ def initialise_guests(n: int) -> List[Guest]:
         if i % 2 == 0:  # if even
             neighbours.append(guests[i - 3])
 
-        guest = Guest(i, neighbours, False)
+        guest = Guest(i, neighbours, rand_bool())
         guests.append(guest)
 
         guests[i - 1].neighbours.append(guest)
@@ -33,12 +39,10 @@ def initialise_guests(n: int) -> List[Guest]:
 
 
 def get_group_happiness(guests: List[Guest]) -> int:
-    print("Debug call to get_happiness")
     return sum(guest.happy for guest in guests)
 
 
 def night(guests: List[Guest]) -> int:
-    print("Debug call to night")
     attendees = [guest for guest in guests if guest.decide()]
     attendance = len(attendees)
     for guest in attendees:
@@ -56,6 +60,16 @@ if __name__ == "__main__":
     #     attendance.append(night(guests))
     #     group_happiness.append(get_group_happiness(guests))
 
-    attendance, group_happiness = [
-        (night(guests), get_group_happiness(guests)) for _ in range(10)
-    ]
+    attendance, group_happiness = zip(
+        *[(night(guests), get_group_happiness(guests)) for _ in range(100)]
+    )
+
+    plt.figure()
+    plt.plot(attendance)
+    plt.title("Attendance")
+
+    plt.figure()
+    plt.plot(group_happiness)
+    plt.title("Group happiness")
+
+    plt.show()
