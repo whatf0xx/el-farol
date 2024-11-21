@@ -24,7 +24,9 @@ def initialise_guests(n: int) -> List[Guest]:
         if i % 2 == 0:
             guests[i - 3].neighbours.append(guest)
 
-    guest0.neighbours.append([guests[-1], guests[-2]])
+    guests[-3].neighbours.append(guest0)
+    guests[-1].neighbours.extend([guest0, guest2])
+    guest0.neighbours.extend([guests[-1], guests[-2]])
     guest2.neighbours.append(guests[-2])
 
     return guests
@@ -46,8 +48,10 @@ def night(guests: List[Guest]) -> int:
 
 
 if __name__ == "__main__":
-    guests = initialise_guests(10)
-    for guest in guests:
+    guests = initialise_guests(100)
+    for guest in guests[:10]:
+        print(f"{guest}, neighbours: {guest.neighbours}")
+    for guest in guests[90:]:
         print(f"{guest}, neighbours: {guest.neighbours}")
     # nights = range(100)
     # attendance = []
