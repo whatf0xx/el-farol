@@ -28,12 +28,13 @@ class Guest:
         bad_evening_multiplier: float,
         max_capacity: int,
         attendance_sensitivity: float,
-    ):
+    ) -> float:
         x = bad_evening_multiplier
         c = max_capacity
         s = attendance_sensitivity
         a = attendance
         self.opinion = x / (1 + np.exp((a - c) * s)) - x + 1
+        return self.opinion
 
     def decide(self, peer_pressure: float, opinion_recovery: float) -> bool:
         neighbour_opinion = sum(n.opinion for n in self.neighbours)
@@ -41,7 +42,7 @@ class Guest:
         if decision > 0:
             return True
         else:
-            self.opinion += opinion_recovery
+            self.opinion += opinion_recovery if self.opinion < 0 else 0
             return False
 
 
