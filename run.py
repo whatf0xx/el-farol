@@ -1,5 +1,6 @@
 from typing import List
 import matplotlib.pyplot as plt
+import numpy as np
 from random import random
 import networkx as nx
 
@@ -7,10 +8,11 @@ import networkx as nx
 NIGHTS = 800
 SHOW_LAST = 100
 NO_GUESTS = 300
-NO_CONNECTIONS = 12
+NO_CONNECTIONS = 3
 MAX_CAPACITY = 60
-PEER_PRESSURE = 1.02
+PEER_PRESSURE = 0.9
 BAD_EVENING_MULTIPLIER = 2.0
+ATTENDANCE_SENSITIVITY = 0.5
 OPINION_RECOVERY = 0.21
 
 
@@ -32,15 +34,16 @@ class Guest:
     def __repr__(self) -> str:
         return f"Guest{self.id}"
 
-    def evaluate_evening(self, attendance: int, capacity: int):
-        if attendance > capacity:
-            self.opinion = -BAD_EVENING_MULTIPLIER
-        else:
-            self.opinion = 1.0
+    def evaluate_evening(self, attendance: int):
+        x = BAD_EVENING_MULTIPLIER
+        c = MAX_CAPACITY
+        s = ATTENDANCE_SENSITIVITY
+        a = attendance
+        self.opinion = x / (1 + np.exp((a - c) * s)) - x + 1
 
-    def decide(self, peer_pressure: float) -> bool:
+    def decide(self) -> bool:
         neighbour_opinion = sum(n.opinion for n in self.neighbours)
-        decision = self.opinion + peer_pressure * neighbour_opinion
+        decision = self.opinion + PEER_PRESSURE * neighbour_opinion
         if decision > 0:
             return True
         else:
@@ -70,12 +73,14 @@ def night(guests: List[Guest]) -> int:
     # print(f"{guests[50]}; opinion: {guests[50].opinion}")
     # for n in guests[50].neighbours:
     #     print(f"\t{n}; opinion: {n.opinion}")
-    attendees = [guest for guest in guests if guest.decide(PEER_PRESSURE)]
+    attendees = [guest for guest in guests if guest.decide()]
     attendance = len(attendees)
     for guest in attendees:
-        guest.evaluate_evening(attendance, MAX_CAPACITY)
+        guest.evaluate_evening(attendance)
 
-    return attendance, attendance * int(attendance < MAX_CAPACITY)
+    happiness = sum(guest.opinion for guest in guests)
+
+    return attendance, happiness
 
 
 if __name__ == "__main__":
