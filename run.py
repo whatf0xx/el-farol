@@ -16,9 +16,9 @@ OPINION_RECOVERY = 0.11
 
 
 if __name__ == "__main__":
-    peer_pressures = np.linspace(0.9, 1.2, 40)
-    opinion_recoveries = np.linspace(0.05, 0.2, 40)
-    bad_eve_multipliers = np.linspace(0.9, 3.0, 40)
+    peer_pressures = np.linspace(0.98, 1.04, 4)
+    opinion_recoveries = np.linspace(0.09, 0.11, 4)
+    bad_eve_multipliers = np.linspace(0.9, 1.1, 4)
     best_score = np.inf
     params = (None, None, None)
     for p, r, m in product(
@@ -27,6 +27,7 @@ if __name__ == "__main__":
         sim = Simulation(
             NO_GUESTS,
             NO_CONNECTIONS,
+            "random_regular",
             m,
             MAX_CAPACITY,
             ATTENDANCE_SENSITIVITY,
@@ -49,6 +50,7 @@ if __name__ == "__main__":
     sim = Simulation(
         NO_GUESTS,
         NO_CONNECTIONS,
+        "random_regular",
         m,
         MAX_CAPACITY,
         ATTENDANCE_SENSITIVITY,
