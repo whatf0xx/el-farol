@@ -38,11 +38,15 @@ class Guest:
 
     def decide(self, peer_pressure: float, opinion_recovery: float) -> bool:
         neighbour_opinion = sum(n.opinion for n in self.neighbours)
-        decision = self.opinion + peer_pressure * neighbour_opinion
+        decision = (
+            self.opinion
+            + peer_pressure * neighbour_opinion
+            + 0.1 * (random() - 0.5)
+        )
         if decision > 0:
             return True
         else:
-            self.opinion += opinion_recovery if self.opinion < 0 else 0
+            self.opinion = min(0, self.opinion + opinion_recovery)
             return False
 
 

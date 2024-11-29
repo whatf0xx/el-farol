@@ -4,30 +4,30 @@ from tqdm.contrib.itertools import product
 import numpy as np
 
 
-NIGHTS = 400
-SHOW_LAST = 100
+NIGHTS = 200
+SHOW_LAST = 20
 NO_GUESTS = 300
 NO_CONNECTIONS = 11
 MAX_CAPACITY = 60
-PEER_PRESSURE = 1.18
-BAD_EVENING_MULTIPLIER = 1.16
+PEER_PRESSURE = 0.97
+BAD_EVENING_MULTIPLIER = 1.33
 ATTENDANCE_SENSITIVITY = 0.5
-OPINION_RECOVERY = 0.48
+OPINION_RECOVERY = 0.11
 
 
 if __name__ == "__main__":
-    peer_pressures = np.linspace(0.8, 1.4, 20)
-    bad_eve_multipliers = np.linspace(1.0, 4.0, 20)
-    opinion_recoveries = np.linspace(0.05, 0.5, 20)
-    best_score = -np.inf
+    peer_pressures = np.linspace(0.9, 1.2, 40)
+    opinion_recoveries = np.linspace(0.05, 0.2, 40)
+    bad_eve_multipliers = np.linspace(0.9, 3.0, 40)
+    best_score = np.inf
     params = (None, None, None)
-    for p, b, r in product(
-        peer_pressures, bad_eve_multipliers, opinion_recoveries
+    for p, r, m in product(
+        peer_pressures, opinion_recoveries, bad_eve_multipliers
     ):
         sim = Simulation(
             NO_GUESTS,
             NO_CONNECTIONS,
-            b,
+            m,
             MAX_CAPACITY,
             ATTENDANCE_SENSITIVITY,
             p,
@@ -35,20 +35,21 @@ if __name__ == "__main__":
         )
 
         attendance, group_happiness = zip(*[sim.step() for _ in range(NIGHTS)])
-        score = sum(group_happiness[-SHOW_LAST:])
-        if score > best_score:
+        average_attendance = sum(attendance[-SHOW_LAST:]) / SHOW_LAST
+        score = (MAX_CAPACITY - average_attendance) ** 2
+        if score < best_score:
             best_score = score
-            params = (p, b, r)
+            params = (p, r, m)
 
-    p, b, r = params
+    p, r, m = params
     print(
-        f"PEER_PRESSURE = {p}, BAD_EVENING_MULTIPLIER = {b}, OPINION_RECOVERY = {r}"
+        f"PEER_PRESSURE = {p}, OPINION_RECOVERY = {r}, BAD_EVE_MULTIPLIER = {m}"
     )
 
     sim = Simulation(
         NO_GUESTS,
         NO_CONNECTIONS,
-        b,
+        m,
         MAX_CAPACITY,
         ATTENDANCE_SENSITIVITY,
         p,
